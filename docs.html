@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AetherOS Documentation - Getting Started</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: #ffffff;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #00ffff;
+        }
+        
+        .docs-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 3rem;
+            padding: 3rem 0;
+            min-height: calc(100vh - 80px);
+        }
+        
+        .sidebar {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 2rem;
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+        
+        .sidebar h3 {
+            color: #00ffff;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .sidebar ul {
+            list-style: none;
+        }
+        
+        .sidebar li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar a {
+            color: #cccccc;
+            text-decoration: none;
+            transition: color 0.3s;
+            display: block;
+            padding: 0.5rem;
+            border-radius: 5px;
+        }
+        
+        .sidebar a:hover,
+        .sidebar a.active {
+            color: #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+        }
+        
+        .content {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            padding: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .content h2 {
+            color: #00ffff;
+            margin: 2rem 0 1rem 0;
+            font-size: 1.8rem;
+        }
+        
+        .content h3 {
+            color: #ff00ff;
+            margin: 1.5rem 0 1rem 0;
+            font-size: 1.4rem;
+        }
+        
+        .content p {
+            margin-bottom: 1rem;
+            color: #cccccc;
+        }
+        
+        .content code {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            color: #00ffff;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .content pre {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 1.5rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+        
+        .content pre code {
+            background: none;
+            padding: 0;
+            color: #ffffff;
+        }
+        
+        .warning {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.5);
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .info {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.5);
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .success {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .feature-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+        
+        .feature-item h4 {
+            color: #00ffff;
+            margin-bottom: 0.5rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(45deg, #00ffff, #0099ff);
+            color: #000000;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 1rem 0;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 255, 255, 0.3);
+        }
+        
+        /* Floating Navigation Helper */
+        .nav-helper {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00f5ff;
+            border-radius: 15px;
+            padding: 1rem;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-helper h4 {
+            color: #00f5ff;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .nav-helper-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-helper-links a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.3s;
+        }
+
+        .nav-helper-links a:hover {
+            color: #00f5ff;
+        }
+
+        @media (max-width: 768px) {
+            .docs-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .sidebar {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <div class="logo">
+                <a href="index.html" style="color: inherit; text-decoration: none;">✨ AetherOS</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#features">Features</a></li>
+                <li><a href="index.html#performance">Performance</a></li>
+                <li><a href="index.html#ai">AI Architecture</a></li>
+                <li><a href="index.html#tutorials">Learn AetherOS</a></li>
+                <li><a href="docs.html" style="color: #00f5ff;">Documentation</a></li>
+                <li><a href="labs.html">Interactive Labs</a></li>
+                <li><a href="fps_debug_solver.html">Performance Tools</a></li>
+                <li><a href="index.html#download">Download</a></li>
+                <li><a href="index.html#community">Community</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="docs-container">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <h3>Getting Started</h3>
+                <ul>
+                    <li><a href="#overview" class="active">Overview</a></li>
+                    <li><a href="#requirements">System Requirements</a></li>
+                    <li><a href="#installation">Installation</a></li>
+                    <li><a href="#first-boot">First Boot</a></li>
+                    <li><a href="#basic-usage">Basic Usage</a></li>
+                </ul>
+                
+                <h3>Features</h3>
+                <ul>
+                    <li><a href="#ai-agents">AI Agents</a></li>
+                    <li><a href="#gaming">Gaming Mode</a></li>
+                    <li><a href="#development">Development</a></li>
+                    <li><a href="#security">Security</a></li>
+                </ul>
+                
+                <h3>Advanced</h3>
+                <ul>
+                    <li><a href="#building">Building from Source</a></li>
+                    <li><a href="#customization">Customization</a></li>
+                    <li><a href="#troubleshooting">Troubleshooting</a></li>
+                    <li><a href="#api">API Reference</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="content">
+                <h1 id="overview">AetherOS Documentation</h1>
+                
+                <div class="info">
+                    <strong>🚀 Welcome to AetherOS!</strong> This documentation will guide you through installation, configuration, and advanced usage of the world's first AI-transcendent operating system.
+                </div>
+
+                <h2 id="requirements">System Requirements</h2>
+                
+                <h3>Minimum Requirements</h3>
+                <ul>
+                    <li><strong>Architecture:</strong> x86/x86_64 compatible processor</li>
+                    <li><strong>RAM:</strong> 256MB</li>
+                    <li><strong>Storage:</strong> 50MB free space</li>
+                    <li><strong>Boot:</strong> USB drive or CD/DVD</li>
+                </ul>
+                
+                <h3>Recommended Configuration</h3>
+                <ul>
+                    <li><strong>CPU:</strong> Multi-core processor with virtualization support</li>
+                    <li><strong>RAM:</strong> 512MB or more</li>
+                    <li><strong>Storage:</strong> 100MB for full installation</li>
+                    <li><strong>Graphics:</strong> DirectX 11 or OpenGL 4.0 compatible</li>
+                </ul>
+
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <h4>✅ Supported Architectures</h4>
+                        <p>x86, x86_64, ARM32, ARM64</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>💾 Ultra Lightweight</h4>
+                        <p>Only 12MB ISO, 50MB installation</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>🚀 Fast Performance</h4>
+                        <p>Runs efficiently on older hardware</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>🔧 Easy Setup</h4>
+                        <p>Automatic hardware detection</p>
+                    </div>
+                </div>
+
+                <h2 id="installation">Installation Guide</h2>
+
+                <h3>Quick Installation (Recommended)</h3>
+                
+                <div class="warning">
+                    <strong>⚠️ Important:</strong> Back up your important data before proceeding. AetherOS installation will overwrite the target drive.
+                </div>
+
+                <h4>Step 1: Download AetherOS</h4>
+                <p>Download the latest AetherOS Community Edition ISO:</p>
+                <pre><code># Using wget
+wget https://github.com/aether-os/releases/latest/download/aetheros-community.iso
+
+# Using curl
+curl -L -o aetheros-community.iso https://github.com/aether-os/releases/latest/download/aetheros-community.iso
+
+# Verify checksum
+sha256sum aetheros-community.iso</code></pre>
+
+                <h4>Step 2: Create Bootable USB</h4>
+                
+                <p><strong>Linux/macOS:</strong></p>
+                <pre><code># Find your USB device
+lsblk
+
+# Create bootable USB (replace /dev/sdX with your USB device)
+sudo dd if=aetheros-community.iso of=/dev/sdX bs=4M status=progress
+sync</code></pre>
+
+                <p><strong>Windows:</strong></p>
+                <ul>
+                    <li>Download and install <a href="https://rufus.ie/" style="color: #00ffff;">Rufus</a></li>
+                    <li>Select the AetherOS ISO file</li>
+                    <li>Choose your USB drive</li>
+                    <li>Click "Start" to create bootable USB</li>
+                </ul>
+
+                <h4>Step 3: Boot from USB</h4>
+                <ol>
+                    <li>Insert the bootable USB into your target computer</li>
+                    <li>Restart the computer</li>
+                    <li>Press F12, F2, or Del (varies by manufacturer) to access boot menu</li>
+                    <li>Select the USB drive from the boot menu</li>
+                </ol>
+
+                <div class="success">
+                    <strong>✅ Success!</strong> AetherOS will boot in approximately 4.2 seconds and automatically detect your hardware.
+                </div>
+
+                <h2 id="first-boot">First Boot Experience</h2>
+
+                <h3>What to Expect</h3>
+                <p>When AetherOS boots for the first time, you'll see:</p>
+
+                <ol>
+                    <li><strong>Boot Sequence (4.2s):</strong> Watch the debug markers A→B→C→...→W</li>
+                    <li><strong>Hardware Detection:</strong> Automatic driver loading</li>
+                    <li><strong>AI Initialization:</strong> 10 AI agents coming online</li>
+                    <li><strong>Desktop Environment:</strong> Lightweight, responsive interface</li>
+                </ol>
+
+                <h3>AI Agent Welcome</h3>
+                <p>Upon first boot, the AI agents will:</p>
+                <ul>
+                    <li>Analyze your hardware configuration</li>
+                    <li>Optimize system performance automatically</li>
+                    <li>Present a guided tour of AetherOS features</li>
+                    <li>Configure optimal settings for your use case</li>
+                </ul>
+
+                <h2 id="basic-usage">Basic Usage</h2>
+
+                <h3>Voice Commands</h3>
+                <p>AetherOS includes natural language processing. Try these commands:</p>
+                <pre><code># Say or type these commands:
+"Open terminal"
+"Show system performance"
+"Enable gaming mode"
+"Start development environment"
+"Optimize for battery life"
+"What's my system status?"</code></pre>
+
+                <h3>Command Line Interface</h3>
+                <p>Access the powerful AetherOS command line:</p>
+                <pre><code># System information
+aether-info
+
+# AI agent status
+aether-agents status
+
+# Performance monitoring
+aether-monitor
+
+# Gaming optimization
+aether-gaming enable
+
+# Development tools
+aether-dev setup</code></pre>
+
+                <h2 id="ai-agents">AI Agents System</h2>
+
+                <p>AetherOS features 10 specialized AI agents that work together to provide an intelligent computing experience:</p>
+
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <h4>🎯 Performance Agent</h4>
+                        <p>Continuously optimizes system performance based on usage patterns</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>🛡️ Security Agent</h4>
+                        <p>Real-time threat detection and automated security responses</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>🎮 Gaming Agent</h4>
+                        <p>Optimizes resources for maximum gaming performance</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>💻 Development Agent</h4>
+                        <p>AI-powered coding assistance and debugging support</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>🔧 System Agent</h4>
+                        <p>Automated maintenance and self-healing capabilities</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4>🧠 Learning Agent</h4>
+                        <p>Adapts system behavior based on user preferences</p>
+                    </div>
+                </div>
+
+                <h3>Interacting with AI Agents</h3>
+                <pre><code># List all agents
+aether-agents list
+
+# Query specific agent
+aether-agents query performance "How can I improve boot time?"
+
+# Configure agent behavior
+aether-agents config gaming --priority high
+
+# View agent logs
+aether-agents logs security --tail 50</code></pre>
+
+                <h2 id="gaming">Gaming Mode</h2>
+
+                <p>AetherOS Gaming Mode delivers industry-leading performance with 0.8ms input latency:</p>
+
+                <h3>Enabling Gaming Mode</h3>
+                <pre><code># Enable gaming mode
+aether-gaming enable
+
+# Gaming mode with specific optimizations
+aether-gaming enable --cpu-priority high --memory-lock --gpu-boost
+
+# Check gaming performance
+aether-gaming status</code></pre>
+
+                <h3>Gaming Features</h3>
+                <ul>
+                    <li><strong>Input Latency:</strong> 0.8ms (6x better than Windows)</li>
+                    <li><strong>Frame Timing:</strong> Consistent 16.67ms for 60 FPS</li>
+                    <li><strong>Memory Lock:</strong> Prevent game memory swapping</li>
+                    <li><strong>CPU Priority:</strong> Real-time scheduling for games</li>
+                    <li><strong>Background Pause:</strong> Suspend non-essential processes</li>
+                </ul>
+
+                <h2 id="development">Development Environment</h2>
+
+                <p>AetherOS includes comprehensive development tools with AI assistance:</p>
+
+                <h3>Built-in Tools</h3>
+                <ul>
+                    <li><strong>Compilers:</strong> GCC, Clang, with C++20 support</li>
+                    <li><strong>Languages:</strong> C, C++, Python, JavaScript, Rust</li>
+                    <li><strong>Build Systems:</strong> Make, CMake, Ninja</li>
+                    <li><strong>Debuggers:</strong> GDB with AI-enhanced debugging</li>
+                    <li><strong>Version Control:</strong> Git with intelligent commit suggestions</li>
+                </ul>
+
+                <h3>AI-Powered Development</h3>
+                <pre><code># AI code completion
+aether-dev complete "implement bubble sort in"
+
+# AI debugging assistance
+aether-dev debug --analyze crash.log
+
+# AI code review
+aether-dev review --file main.cpp
+
+# Generate documentation
+aether-dev docs --generate --format markdown</code></pre>
+
+                <h2 id="building">Building from Source</h2>
+
+                <p>Build AetherOS yourself for customization or contribution:</p>
+
+                <h3>Prerequisites</h3>
+                <pre><code># Install build dependencies (Ubuntu/Debian)
+sudo apt update
+sudo apt install build-essential nasm grub-common grub-pc-bin xorriso
+
+# Install build dependencies (Fedora)
+sudo dnf groupinstall "Development Tools"
+sudo dnf install nasm grub2-tools xorriso</code></pre>
+
+                <h3>Build Process</h3>
+                <pre><code># Clone repository
+git clone https://github.com/aether-os/aether-os.git
+cd aether-os
+
+# Build kernel
+make clean
+make all
+
+# Create bootable ISO
+make iso
+
+# Test in QEMU
+make test
+
+# Install to USB (replace /dev/sdX)
+sudo make install USB_DEVICE=/dev/sdX</code></pre>
+
+                <h3>Build Configuration</h3>
+                <pre><code># Debug build
+make DEBUG=1
+
+# Release build with optimizations
+make RELEASE=1
+
+# Build for specific architecture
+make ARCH=x86_64
+make ARCH=arm64
+
+# Custom kernel features
+make FEATURES="ai_agents gaming_mode dev_tools"</code></pre>
+
+                <h2 id="troubleshooting">Troubleshooting</h2>
+
+                <h3>Common Issues</h3>
+
+                <div class="warning">
+                    <strong>Boot Issues:</strong>
+                    <ul>
+                        <li>Ensure Secure Boot is disabled in BIOS/UEFI</li>
+                        <li>Try different USB ports (USB 2.0 vs 3.0)</li>
+                        <li>Verify ISO integrity with checksum</li>
+                    </ul>
+                </div>
+
+                <div class="info">
+                    <strong>Performance Issues:</strong>
+                    <ul>
+                        <li>Check AI agent status: <code>aether-agents status</code></li>
+                        <li>Monitor system resources: <code>aether-monitor</code></li>
+                        <li>Review optimization logs: <code>aether-logs performance</code></li>
+                    </ul>
+                </div>
+
+                <h3>Getting Help</h3>
+                <ul>
+                    <li><strong>Documentation:</strong> This comprehensive guide</li>
+                    <li><strong>Community:</strong> <a href="https://discord.gg/2ntX7rW792" target="_blank" style="color: #00f5ff;">Discord server</a> for real-time help</li>
+                    <li><strong>Issues:</strong> GitHub repository for bug reports</li>
+                    <li><strong>AI Assistant:</strong> Built-in help system</li>
+                </ul>
+
+                <div class="success">
+                    <strong>Need More Help?</strong> Join our community <a href="https://discord.gg/2ntX7rW792" target="_blank" style="color: #00f5ff;">Discord server</a> where AetherOS developers and users provide support 24/7.
+                </div>
+
+                <a href="index.html#download" class="btn">Download AetherOS Now</a>
+            </main>
+        </div>
+    </div>
+
+    <div class="nav-helper">
+        <h4>Quick Navigation</h4>
+        <div class="nav-helper-links">
+            <a href="index.html">🏠 Home</a>
+            <a href="labs.html">🧪 Labs</a>
+            <a href="fps_debug_solver.html">⚡ Performance Tools</a>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Update active sidebar link based on scroll position
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('h2[id], h1[id]');
+            const sidebarLinks = document.querySelectorAll('.sidebar a');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            sidebarLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+
+    <!-- Enhanced Navigation Footer -->
+    <footer style="
+        background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(26, 26, 46, 0.9) 50%, rgba(22, 33, 62, 0.95) 100%);
+        backdrop-filter: blur(20px);
+        border-top: 2px solid transparent;
+        border-image: linear-gradient(90deg, #00f5ff, #ff00ff, #ffff00, #00ff00) 1;
+        padding: 3rem 0 2rem;
+        margin-top: 4rem;
+        position: relative;
+        overflow: hidden;
+    ">
+        <div class="container">
+            <!-- Main Navigation -->
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h3 style="color: #00f5ff; margin-bottom: 1.5rem; font-size: 1.3rem;">📚 Continue Your AetherOS Journey</h3>
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;">
+                    <a href="index.html" style="
+                        background: linear-gradient(45deg, #00f5ff, #ff00ff);
+                        padding: 1rem 2rem;
+                        border-radius: 50px;
+                        text-decoration: none;
+                        color: white;
+                        font-weight: bold;
+                        transition: all 0.3s ease;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        box-shadow: 0 4px 15px rgba(0, 245, 255, 0.3);
+                    " onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        🏠 Back to Home
+                    </a>
+                    <a href="labs.html" style="
+                        background: linear-gradient(45deg, #ff00ff, #ffff00);
+                        padding: 1rem 2rem;
+                        border-radius: 50px;
+                        text-decoration: none;
+                        color: white;
+                        font-weight: bold;
+                        transition: all 0.3s ease;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        box-shadow: 0 4px 15px rgba(255, 0, 255, 0.3);
+                    " onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        🧪 Try Interactive Labs
+                    </a>
+                    <a href="fps_debug_solver.html" style="
+                        background: linear-gradient(45deg, #ffff00, #00ff00);
+                        padding: 1rem 2rem;
+                        border-radius: 50px;
+                        text-decoration: none;
+                        color: white;
+                        font-weight: bold;
+                        transition: all 0.3s ease;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        box-shadow: 0 4px 15px rgba(255, 255, 0, 0.3);
+                    " onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        ⚡ Performance Tools
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Links Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                <div style="text-align: center;">
+                    <h4 style="color: #ff00ff; margin-bottom: 1rem;">🚀 Quick Actions</h4>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <a href="#installation" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">📥 Installation Guide</a>
+                        <a href="#getting-started" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">🎯 Getting Started</a>
+                        <a href="#api-reference" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">📖 API Reference</a>
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <h4 style="color: #ffff00; margin-bottom: 1rem;">🎮 Gaming Features</h4>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <a href="#gaming-optimization" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">🎯 Gaming Optimization</a>
+                        <a href="#fps-enhancement" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">⚡ FPS Enhancement</a>
+                        <a href="#game-development" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">🛠️ Game Development</a>
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <h4 style="color: #00ff00; margin-bottom: 1rem;">🔧 Developer Tools</h4>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <a href="https://github.com/aetheros/kernel" target="_blank" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">🐙 Source Code</a>
+                        <a href="#debugging" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">🐛 Debugging Guide</a>
+                        <a href="#contribution" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">🤝 Contributing</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1.5rem; text-align: center;">
+                <p style="color: #888; margin-bottom: 1rem; font-size: 1rem;">
+                    📚 Master AetherOS through comprehensive documentation
+                </p>
+                <div style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+                    <span style="color: #00f5ff; font-size: 0.9rem;">🚀 AI-Powered Documentation</span>
+                    <span style="color: #ff00ff; font-size: 0.9rem;">📖 Interactive Learning</span>
+                    <span style="color: #ffff00; font-size: 0.9rem;">⚡ Quick Reference</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

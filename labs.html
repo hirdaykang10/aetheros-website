@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AetherOS Labs - Hands-on Learning</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(45deg, #00f5ff, #ff00ff, #ffff00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .lab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .lab-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .lab-card:hover {
+            transform: translateY(-10px);
+            border-color: #00f5ff;
+            box-shadow: 0 20px 40px rgba(0, 245, 255, 0.2);
+        }
+
+        .lab-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .lab-card h3 {
+            color: #00f5ff;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .lab-card p {
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .difficulty {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .difficulty.beginner {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+
+        .difficulty.intermediate {
+            background: rgba(255, 255, 0, 0.2);
+            color: #ffff00;
+            border: 1px solid #ffff00;
+        }
+
+        .difficulty.advanced {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff4444;
+            border: 1px solid #ff4444;
+        }
+
+        .lab-button {
+            background: linear-gradient(45deg, #00f5ff, #ff00ff);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .lab-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 245, 255, 0.3);
+        }
+
+        .interactive-lab {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .terminal {
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            color: #00ff00;
+            min-height: 200px;
+            margin: 1rem 0;
+            overflow-y: auto;
+        }
+
+        .command-input {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 0.5rem;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        /* Navigation Header */
+        header.main-nav {
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #00f5ff;
+            text-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+        }
+
+        /* Floating Navigation Helper */
+        .nav-helper {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00f5ff;
+            border-radius: 15px;
+            padding: 1rem;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-helper h4 {
+            color: #00f5ff;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .nav-helper-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-helper-links a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.3s;
+        }
+
+        .nav-helper-links a:hover {
+            color: #00f5ff;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-nav">
+        <nav>
+            <div class="logo">
+                <a href="index.html" style="color: inherit; text-decoration: none;">✨ AetherOS</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#features">Features</a></li>
+                <li><a href="index.html#performance">Performance</a></li>
+                <li><a href="index.html#ai">AI Architecture</a></li>
+                <li><a href="index.html#tutorials">Learn AetherOS</a></li>
+                <li><a href="docs.html">Documentation</a></li>
+                <li><a href="labs.html" style="color: #00f5ff;">Interactive Labs</a></li>
+                <li><a href="fps_debug_solver.html">Performance Tools</a></li>
+                <li><a href="index.html#download">Download</a></li>
+                <li><a href="index.html#community">Community</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <header>
+            <h1>🔬 AetherOS Labs</h1>
+            <p style="font-size: 1.2rem; opacity: 0.9;">Hands-on experiments and learning experiences</p>
+        </header>
+
+        <div class="lab-grid">
+            <div class="lab-card">
+                <span class="lab-icon">🚀</span>
+                <div class="difficulty beginner">Beginner</div>
+                <h3>Kernel Boot Sequence</h3>
+                <p>Learn how AetherOS boots by stepping through the kernel initialization process. Understand multiboot, memory setup, and core initialization.</p>
+                <button class="lab-button" onclick="openLab('boot-sequence')">Start Lab</button>
+            </div>
+
+            <div class="lab-card">
+                <span class="lab-icon">🤖</span>
+                <div class="difficulty intermediate">Intermediate</div>
+                <h3>AI Agent Communication</h3>
+                <p>Explore how AI agents communicate with each other and the kernel. Build a simple agent and see it interact with the system.</p>
+                <button class="lab-button" onclick="openLab('ai-communication')">Start Lab</button>
+            </div>
+
+            <div class="lab-card">
+                <span class="lab-icon">⚡</span>
+                <div class="difficulty intermediate">Intermediate</div>
+                <h3>Performance Optimization</h3>
+                <p>Learn to identify bottlenecks and optimize system performance. Use profiling tools and implement performance improvements.</p>
+                <button class="lab-button" onclick="openLab('performance-optimization')">Start Lab</button>
+            </div>
+
+            <div class="lab-card">
+                <span class="lab-icon">🎮</span>
+                <div class="difficulty beginner">Beginner</div>
+                <h3>Gaming Mode Configuration</h3>
+                <p>Configure AetherOS for optimal gaming performance. Learn about GPU drivers, CPU scheduling, and memory management for games.</p>
+                <button class="lab-button" onclick="openLab('gaming-mode')">Start Lab</button>
+            </div>
+
+            <div class="lab-card">
+                <span class="lab-icon">🔒</span>
+                <div class="difficulty advanced">Advanced</div>
+                <h3>Security Hardening</h3>
+                <p>Implement advanced security features including sandboxing, encryption, and intrusion detection systems.</p>
+                <button class="lab-button" onclick="openLab('security-hardening')">Start Lab</button>
+            </div>
+
+            <div class="lab-card">
+                <span class="lab-icon">🌐</span>
+                <div class="difficulty intermediate">Intermediate</div>
+                <h3>Network Stack Deep Dive</h3>
+                <p>Understand AetherOS networking from the ground up. Implement custom protocols and optimize network performance.</p>
+                <button class="lab-button" onclick="openLab('network-stack')">Start Lab</button>
+            </div>
+        </div>
+
+        <div id="interactive-lab" class="interactive-lab" style="display: none;">
+            <div id="lab-content"></div>
+        </div>
+    </div>
+
+    <script>
+        function openLab(labId) {
+            const labContent = document.getElementById('lab-content');
+            const interactiveLab = document.getElementById('interactive-lab');
+            
+            const labs = {
+                'boot-sequence': {
+                    title: '🚀 Kernel Boot Sequence Lab',
+                    content: `
+                        <h3>Understanding AetherOS Boot Process</h3>
+                        <p>In this lab, you'll learn about the AetherOS boot sequence step by step.</p>
+                        
+                        <h4>Step 1: GRUB Bootloader</h4>
+                        <p>The GRUB bootloader loads the AetherOS kernel into memory.</p>
+                        <div class="terminal" id="boot-terminal">
+GRUB loading...
+Loading kernel at 0x100000...
+Kernel size: 2.4MB
+Multiboot header found ✓
+Jumping to kernel entry point...
+                        </div>
+                        
+                        <h4>Try these commands:</h4>
+                        <input type="text" class="command-input" placeholder="Type 'boot-info' to see boot parameters" onkeypress="handleBootCommand(event)">
+                    `,
+                    commands: {
+                        'boot-info': 'Boot parameters:\n- Memory: 4GB detected\n- CPU: x64 compatible\n- Multiboot magic: 0x36d76289',
+                        'memory-map': 'Memory map:\n- 0x00000000-0x0009FFFF: Available\n- 0x000A0000-0x000FFFFF: Reserved\n- 0x00100000-0xFFFFFFFF: Available',
+                        'help': 'Available commands: boot-info, memory-map, next-step'
+                    }
+                },
+                'ai-communication': {
+                    title: '🤖 AI Agent Communication Lab',
+                    content: `
+                        <h3>AI Agent Message Passing</h3>
+                        <p>Learn how AI agents communicate through the AetherOS message bus.</p>
+                        
+                        <div class="terminal" id="ai-terminal">
+AetherOS AI Communication Lab
+=============================
+12 AI agents active
+Message bus initialized ✓
+
+Agent types:
+- ResourceManager: Monitors system resources
+- GameOptimizer: Optimizes for gaming performance  
+- VoiceProcessor: Handles voice commands
+- NetworkIntelligence: Manages network connections
+                        </div>
+                        
+                        <h4>Send messages between agents:</h4>
+                        <input type="text" class="command-input" placeholder="Try: send ResourceManager get-memory-usage" onkeypress="handleAICommand(event)">
+                    `,
+                    commands: {
+                        'send ResourceManager get-memory-usage': 'ResourceManager response:\n- Physical memory: 3.2GB/4GB used\n- Virtual memory: 12GB available\n- Cache: 512MB',
+                        'send GameOptimizer enable': 'GameOptimizer activated:\n- CPU priority boosted\n- GPU performance mode enabled\n- Background processes limited',
+                        'list-agents': 'Active agents:\n- ResourceManager [READY]\n- GameOptimizer [STANDBY]\n- VoiceProcessor [LISTENING]\n- NetworkIntelligence [CONNECTED]'
+                    }
+                },
+                'gaming-mode': {
+                    title: '🎮 Gaming Mode Configuration Lab',
+                    content: `
+                        <h3>Optimize AetherOS for Gaming</h3>
+                        <p>Configure system settings for maximum gaming performance.</p>
+                        
+                        <div class="terminal" id="gaming-terminal">
+AetherOS Gaming Configuration
+============================
+Current status: Standard mode
+GPU: Ready for optimization
+CPU: 4 cores available
+                        </div>
+                        
+                        <h4>Gaming optimization commands:</h4>
+                        <input type="text" class="command-input" placeholder="Try: enable-gaming-mode" onkeypress="handleGamingCommand(event)">
+                    `,
+                    commands: {
+                        'enable-gaming-mode': 'Gaming mode activated!\n- CPU governor set to performance\n- GPU boost enabled\n- Background services minimized\n- Memory defragmented',
+                        'gpu-status': 'GPU Status:\n- Driver: AetherGPU v2.1\n- Memory: 8GB GDDR6\n- Clock: 1850MHz\n- Temperature: 65°C',
+                        'benchmark': 'Running gaming benchmark...\n- Average FPS: 240\n- Frame time: 4.1ms\n- 1% low: 180 FPS\n- Performance: EXCELLENT'
+                    }
+                }
+            };
+            
+            const lab = labs[labId];
+            if (lab) {
+                labContent.innerHTML = `
+                    <h2>${lab.title}</h2>
+                    ${lab.content}
+                    <button onclick="closeLab()" style="margin-top: 2rem; background: #333; border: 1px solid #666; color: white; padding: 0.8rem 1.5rem; border-radius: 5px; cursor: pointer;">Close Lab</button>
+                `;
+                interactiveLab.style.display = 'block';
+                interactiveLab.scrollIntoView({ behavior: 'smooth' });
+                
+                // Store current lab for command handling
+                window.currentLab = labId;
+                window.labCommands = lab.commands;
+            }
+        }
+
+        function closeLab() {
+            document.getElementById('interactive-lab').style.display = 'none';
+        }
+
+        function handleBootCommand(event) {
+            if (event.key === 'Enter') {
+                const command = event.target.value.toLowerCase();
+                const terminal = document.getElementById('boot-terminal');
+                const response = window.labCommands[command] || 'Unknown command. Type "help" for available commands.';
+                
+                terminal.innerHTML += '\n\n$ ' + command + '\n' + response;
+                event.target.value = '';
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+        }
+
+        function handleAICommand(event) {
+            if (event.key === 'Enter') {
+                const command = event.target.value;
+                const terminal = document.getElementById('ai-terminal');
+                const response = window.labCommands[command] || 'Invalid agent command. Try: send <agent> <message>';
+                
+                terminal.innerHTML += '\n\n$ ' + command + '\n' + response;
+                event.target.value = '';
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+        }
+
+        function handleGamingCommand(event) {
+            if (event.key === 'Enter') {
+                const command = event.target.value.toLowerCase();
+                const terminal = document.getElementById('gaming-terminal');
+                const response = window.labCommands[command] || 'Unknown gaming command. Available: enable-gaming-mode, gpu-status, benchmark';
+                
+                terminal.innerHTML += '\n\n$ ' + command + '\n' + response;
+                event.target.value = '';
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+        }
+
+        // Add some interactive animations
+        document.querySelectorAll('.lab-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+
+    <!-- Enhanced Navigation Footer -->
+    <footer style="
+        background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(26, 26, 46, 0.9) 50%, rgba(22, 33, 62, 0.95) 100%);
+        backdrop-filter: blur(20px);
+        border-top: 2px solid transparent;
+        border-image: linear-gradient(90deg, #00f5ff, #ff00ff, #ffff00, #00ff00) 1;
+        padding: 3rem 0 2rem;
+        margin-top: 4rem;
+        position: relative;
+        overflow: hidden;
+    ">
+        <div class="container">
+            <!-- Main Navigation -->
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h3 style="color: #ff00ff; margin-bottom: 1.5rem; font-size: 1.3rem;">🧪 Interactive AetherOS Learning Hub</h3>
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;">
+                    <a href="index.html" style="
+                        background: linear-gradient(45deg, #00f5ff, #ff00ff);
+                        padding: 1rem 2rem;
+                        border-radius: 50px;
+                        text-decoration: none;
+                        color: white;
+                        font-weight: bold;
+                        transition: all 0.3s ease;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        box-shadow: 0 4px 15px rgba(0, 245, 255, 0.3);
+                    " onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        🏠 Back to Home
+                    </a>
+                    <a href="docs.html" style="
+                        background: linear-gradient(45deg, #ff00ff, #ffff00);
+                        padding: 1rem 2rem;
+                        border-radius: 50px;
+                        text-decoration: none;
+                        color: white;
+                        font-weight: bold;
+                        transition: all 0.3s ease;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        box-shadow: 0 4px 15px rgba(255, 0, 255, 0.3);
+                    " onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        📚 Read Documentation
+                    </a>
+                    <a href="fps_debug_solver.html" style="
+                        background: linear-gradient(45deg, #ffff00, #00ff00);
+                        padding: 1rem 2rem;
+                        border-radius: 50px;
+                        text-decoration: none;
+                        color: white;
+                        font-weight: bold;
+                        transition: all 0.3s ease;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        box-shadow: 0 4px 15px rgba(255, 255, 0, 0.3);
+                    " onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        ⚡ Performance Tools
+                    </a>
+                </div>
+            </div>
+
+            <!-- Interactive Features Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                <div style="text-align: center; padding: 1rem; border-radius: 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);">
+                    <h4 style="color: #00f5ff; margin-bottom: 1rem;">🎮 Gaming Labs</h4>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <a href="#fps-optimization" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">🎯 FPS Optimization Lab</a>
+                        <a href="#graphics-tuning" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">🖼️ Graphics Tuning</a>
+                        <a href="#input-latency" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">⚡ Input Latency Test</a>
+                    </div>
+                </div>
+                <div style="text-align: center; padding: 1rem; border-radius: 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);">
+                    <h4 style="color: #ff00ff; margin-bottom: 1rem;">🤖 AI Features</h4>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <a href="#ai-assistant" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">🧠 AI Assistant Demo</a>
+                        <a href="#smart-optimization" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">🚀 Smart Optimization</a>
+                        <a href="#predictive-performance" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">📊 Predictive Analysis</a>
+                    </div>
+                </div>
+                <div style="text-align: center; padding: 1rem; border-radius: 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);">
+                    <h4 style="color: #ffff00; margin-bottom: 1rem;">🔧 System Labs</h4>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <a href="#kernel-explorer" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">🔍 Kernel Explorer</a>
+                        <a href="#memory-profiler" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">💾 Memory Profiler</a>
+                        <a href="#process-monitor" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">📈 Process Monitor</a>
+                    </div>
+                </div>
+                <div style="text-align: center; padding: 1rem; border-radius: 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);">
+                    <h4 style="color: #00ff00; margin-bottom: 1rem;">🎓 Learning Path</h4>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <a href="#beginner-tutorial" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">📚 Beginner Tutorial</a>
+                        <a href="#advanced-concepts" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">🎯 Advanced Concepts</a>
+                        <a href="#certification" style="color: #ccc; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#00f5ff'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#ccc'; this.style.transform='translateX(0)'">🏆 Certification</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1.5rem; text-align: center;">
+                <p style="color: #888; margin-bottom: 1rem; font-size: 1rem;">
+                    🧪 Master AetherOS through hands-on interactive learning
+                </p>
+                <div style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+                    <span style="color: #00f5ff; font-size: 0.9rem;">🎮 Interactive Gaming Labs</span>
+                    <span style="color: #ff00ff; font-size: 0.9rem;">🤖 AI-Powered Learning</span>
+                    <span style="color: #ffff00; font-size: 0.9rem;">📊 Real-time Feedback</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Navigation Helper -->
+    <div class="nav-helper">
+        <h4>Quick Navigation</h4>
+        <div class="nav-helper-links">
+            <a href="index.html">🏠 Home</a>
+            <a href="docs.html">📚 Documentation</a>
+            <a href="fps_debug_solver.html">⚡ Performance Tools</a>
+        </div>
+    </div>
+</body>
+</html>

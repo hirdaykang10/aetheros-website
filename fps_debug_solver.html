@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FPS Debug Solver</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', monospace, sans-serif;
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d2d4a 100%);
+            color: #cdd6f4;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(88, 91, 112, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(88, 91, 112, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #f38ba8, #cba6f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: rgba(17, 17, 27, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(88, 91, 112, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .panel h2 {
+            color: #fab387;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            background: rgba(30, 30, 46, 0.9);
+            border: 1px solid #585b70;
+            border-radius: 8px;
+            color: #cdd6f4;
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+            padding: 15px;
+            resize: vertical;
+            line-height: 1.4;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #cba6f7;
+            box-shadow: 0 0 10px rgba(203, 166, 247, 0.3);
+        }
+
+        .controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(45deg, #cba6f7, #f38ba8);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(203, 166, 247, 0.4);
+        }
+
+        .results {
+            background: rgba(17, 17, 27, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(88, 91, 112, 0.3);
+            backdrop-filter: blur(10px);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .issue {
+            background: rgba(237, 135, 150, 0.1);
+            border-left: 4px solid #ed8796;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+
+        .issue.warning {
+            background: rgba(245, 189, 230, 0.1);
+            border-left-color: #f5bde6;
+        }
+
+        .issue.info {
+            background: rgba(137, 180, 250, 0.1);
+            border-left-color: #89b4fa;
+        }
+
+        .issue h3 {
+            color: #f38ba8;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .issue p {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .code-block {
+            background: rgba(30, 30, 46, 0.8);
+            border: 1px solid #585b70;
+            border-radius: 6px;
+            padding: 10px;
+            margin: 8px 0;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        /* Navigation Header */
+        header.main-nav {
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .nav-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #00f5ff;
+            text-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+        }
+
+        .fps-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(17, 17, 27, 0.9);
+            border: 1px solid #585b70;
+            border-radius: 10px;
+            padding: 10px 15px;
+            font-family: monospace;
+            font-size: 14px;
+            z-index: 1000;
+        }
+
+        .fps-good { color: #a6e3a1; }
+        .fps-medium { color: #f9e2af; }
+        .fps-bad { color: #f38ba8; }
+
+        /* Floating Navigation Helper */
+        .nav-helper {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00f5ff;
+            border-radius: 15px;
+            padding: 1rem;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-helper h4 {
+            color: #00f5ff;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .nav-helper-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-helper-links a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.3s;
+        }
+
+        .nav-helper-links a:hover {
+            color: #00f5ff;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-nav">
+        <nav>
+            <div class="nav-logo">
+                <a href="index.html" style="color: inherit; text-decoration: none;">✨ AetherOS</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#features">Features</a></li>
+                <li><a href="index.html#performance">Performance</a></li>
+                <li><a href="index.html#ai">AI Architecture</a></li>
+                <li><a href="index.html#tutorials">Learn AetherOS</a></li>
+                <li><a href="docs.html">Documentation</a></li>
+                <li><a href="labs.html">Interactive Labs</a></li>
+                <li><a href="fps_debug_solver.html" style="color: #00f5ff;">Performance Tools</a></li>
+                <li><a href="index.html#download">Download</a></li>
+                <li><a href="index.html#community">Community</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="fps-counter" id="fpsCounter">FPS: --</div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🚀 FPS Debug Solver</h1>
+            <p>Automated performance analysis and optimization suggestions</p>
+        </div>
+
+        <div class="main-content">
+            <div class="panel">
+                <h2>📝 Code Input</h2>
+                <textarea id="codeInput" placeholder="Paste your JavaScript/WebGL/Canvas code here...
+Example:
+// Game loop
+function gameLoop() {
+    for(let i = 0; i < 1000; i++) {
+        updateParticle(i);
+    }
+    render();
+    requestAnimationFrame(gameLoop);
+}"></textarea>
+            </div>
+
+            <div class="panel">
+                <h2>⚙️ Performance Metrics</h2>
+                <div id="performanceMetrics">
+                    <div style="margin-bottom: 15px;">
+                        <strong>Current FPS:</strong> <span id="currentFps">--</span>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <strong>Frame Time:</strong> <span id="frameTime">--</span>ms
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <strong>Memory Usage:</strong> <span id="memoryUsage">--</span>MB
+                    </div>
+                    <div>
+                        <strong>Status:</strong> <span id="perfStatus">Ready</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="analyzeCode()">🔍 Analyze Code</button>
+            <button onclick="runPerformanceTest()">⚡ Performance Test</button>
+            <button onclick="clearResults()">🗑️ Clear Results</button>
+            <button onclick="loadExample()">📋 Load Example</button>
+        </div>
+
+        <div class="results" id="results">
+            <h2>🎯 Analysis Results</h2>
+            <p>Click "Analyze Code" to identify performance issues and get optimization suggestions.</p>
+        </div>
+    </div>
+
+    <script>
+        // FPS Counter
+        let lastTime = performance.now();
+        let frameCount = 0;
+        let fps = 0;
+
+        function updateFPS() {
+            frameCount++;
+            const currentTime = performance.now();
+            
+            if (currentTime >= lastTime + 1000) {
+                fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
+                frameCount = 0;
+                lastTime = currentTime;
+                
+                const fpsElement = document.getElementById('fpsCounter');
+                const currentFpsElement = document.getElementById('currentFps');
+                const frameTimeElement = document.getElementById('frameTime');
+                
+                fpsElement.textContent = `FPS: ${fps}`;
+                currentFpsElement.textContent = fps;
+                frameTimeElement.textContent = (1000 / fps).toFixed(2);
+                
+                // Color coding
+                fpsElement.className = fps >= 50 ? 'fps-good' : fps >= 30 ? 'fps-medium' : 'fps-bad';
+            }
+            
+            requestAnimationFrame(updateFPS);
+        }
+        updateFPS();
+
+        // Performance analysis patterns
+        const performancePatterns = [
+            {
+                pattern: /for\s*\([^)]*\)\s*{[^}]*(?:DOM|document\.|getElementById|querySelector)[^}]*}/gi,
+                severity: 'error',
+                title: 'DOM Manipulation in Loop',
+                description: 'DOM operations inside loops can severely impact performance.',
+                solution: 'Move DOM operations outside loops or batch them using DocumentFragment.'
+            },
+            {
+                pattern: /setInterval|setTimeout.*(?:render|draw|update)/gi,
+                severity: 'warning',
+                title: 'Non-RequestAnimationFrame Rendering',
+                description: 'Using setInterval/setTimeout for rendering can cause frame drops.',
+                solution: 'Use requestAnimationFrame for smooth rendering loops.'
+            },
+            {
+                pattern: /for\s*\([^)]*\)\s*{[^}]*for\s*\([^)]*\)/gi,
+                severity: 'error',
+                title: 'Nested Loops',
+                description: 'Nested loops can cause O(n²) performance issues.',
+                solution: 'Consider using more efficient algorithms or data structures.'
+            },
+            {
+                pattern: /new\s+\w+\s*\([^)]*\)\s*;.*(?:render|draw|update)/gi,
+                severity: 'warning',
+                title: 'Object Creation in Render Loop',
+                description: 'Creating objects in render loops triggers garbage collection.',
+                solution: 'Pre-allocate objects or use object pooling patterns.'
+            },
+            {
+                pattern: /Math\.(?:sin|cos|tan|sqrt|pow)\s*\([^)]*\)/gi,
+                severity: 'info',
+                title: 'Heavy Math Operations',
+                description: 'Expensive math operations can impact frame rate.',
+                solution: 'Consider lookup tables or approximation algorithms for frequently used calculations.'
+            },
+            {
+                pattern: /\.push\s*\(|\.splice\s*\(|\.shift\s*\(|\.unshift\s*\(/gi,
+                severity: 'warning',
+                title: 'Array Mutations',
+                description: 'Frequent array mutations can cause performance issues.',
+                solution: 'Use pre-sized arrays or consider using typed arrays for better performance.'
+            },
+            {
+                pattern: /canvas\.getContext\s*\(/gi,
+                severity: 'info',
+                title: 'Canvas Context Retrieval',
+                description: 'Getting canvas context repeatedly can be optimized.',
+                solution: 'Cache the canvas context in a variable instead of retrieving it multiple times.'
+            },
+            {
+                pattern: /(?:addEventListener|removeEventListener).*(?:mousemove|scroll|resize)/gi,
+                severity: 'warning',
+                title: 'High-Frequency Event Listeners',
+                description: 'Event listeners on high-frequency events can impact performance.',
+                solution: 'Use throttling or debouncing for mousemove, scroll, and resize events.'
+            }
+        ];
+
+        function analyzeCode() {
+            const code = document.getElementById('codeInput').value;
+            const results = document.getElementById('results');
+            
+            if (!code.trim()) {
+                results.innerHTML = '<h2>🎯 Analysis Results</h2><p>Please enter some code to analyze.</p>';
+                return;
+            }
+
+            let issues = [];
+            let totalScore = 100;
+
+            // Analyze code patterns
+            performancePatterns.forEach(pattern => {
+                const matches = code.match(pattern.pattern);
+                if (matches) {
+                    issues.push({
+                        ...pattern,
+                        matches: matches.length,
+                        examples: matches.slice(0, 3) // Show first 3 matches
+                    });
+                    
+                    // Deduct points based on severity
+                    const deduction = pattern.severity === 'error' ? 20 : 
+                                    pattern.severity === 'warning' ? 10 : 5;
+                    totalScore -= (deduction * matches.length);
+                }
+            });
+
+            // Generate report
+            let html = '<h2>🎯 Analysis Results</h2>';
+            html += `<div style="margin-bottom: 20px; padding: 15px; background: rgba(166, 227, 161, 0.1); border-radius: 8px; border-left: 4px solid #a6e3a1;">`;
+            html += `<strong>Performance Score: ${Math.max(0, totalScore)}/100</strong>`;
+            html += `</div>`;
+
+            if (issues.length === 0) {
+                html += '<div class="issue info"><h3>✅ No Major Issues Found</h3><p>Your code looks good from a performance perspective!</p></div>';
+            } else {
+                issues.forEach(issue => {
+                    html += `<div class="issue ${issue.severity}">`;
+                    html += `<h3>${issue.title} (${issue.matches} occurrence${issue.matches > 1 ? 's' : ''})</h3>`;
+                    html += `<p><strong>Issue:</strong> ${issue.description}</p>`;
+                    html += `<p><strong>Solution:</strong> ${issue.solution}</p>`;
+                    if (issue.examples.length > 0) {
+                        html += '<p><strong>Examples found:</strong></p>';
+                        issue.examples.forEach(example => {
+                            html += `<div class="code-block">${example}</div>`;
+                        });
+                    }
+                    html += '</div>';
+                });
+            }
+
+            results.innerHTML = html;
+        }
+
+        function runPerformanceTest() {
+            const statusElement = document.getElementById('perfStatus');
+            const memoryElement = document.getElementById('memoryUsage');
+            
+            statusElement.textContent = 'Running test...';
+            
+            // Simulate performance test
+            const startTime = performance.now();
+            let iterations = 0;
+            
+            function testLoop() {
+                iterations++;
+                
+                // Simulate some work
+                for (let i = 0; i < 10000; i++) {
+                    Math.sin(i * 0.1);
+                }
+                
+                if (performance.now() - startTime < 1000) {
+                    requestAnimationFrame(testLoop);
+                } else {
+                    const endTime = performance.now();
+                    const totalTime = endTime - startTime;
+                    const opsPerSecond = Math.round((iterations * 10000) / (totalTime / 1000));
+                    
+                    statusElement.innerHTML = `Test completed: ${opsPerSecond.toLocaleString()} ops/sec`;
+                    
+                    // Update memory usage
+                    if (performance.memory) {
+                        const memoryMB = Math.round(performance.memory.usedJSHeapSize / 1024 / 1024);
+                        memoryElement.textContent = memoryMB;
+                    } else {
+                        memoryElement.textContent = 'N/A';
+                    }
+                }
+            }
+            
+            testLoop();
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '<h2>🎯 Analysis Results</h2><p>Results cleared. Ready for new analysis.</p>';
+            document.getElementById('codeInput').value = '';
+        }
+
+        function loadExample() {
+            const exampleCode = `// Problematic game loop example
+function gameLoop() {
+    // Issue: DOM query in loop
+    for (let i = 0; i < enemies.length; i++) {
+        let element = document.getElementById('enemy' + i);
+        element.style.left = enemies[i].x + 'px';
+        
+        // Issue: Object creation in loop
+        let vector = new Vector2(enemies[i].x, enemies[i].y);
+        
+        // Issue: Expensive math in loop
+        enemies[i].angle = Math.atan2(player.y - enemies[i].y, player.x - enemies[i].x);
+    }
+    
+    // Issue: Using setTimeout instead of requestAnimationFrame
+    setTimeout(gameLoop, 16);
+}
+
+// Issue: High frequency event without throttling
+canvas.addEventListener('mousemove', function(e) {
+    player.x = e.clientX;
+    player.y = e.clientY;
+    render();
+});`;
+
+            document.getElementById('codeInput').value = exampleCode;
+        }
+    </script>
+
+    <!-- Enhanced Navigation Footer -->
+    <footer style="
+        background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(26, 26, 46, 0.9) 50%, rgba(22, 33, 62, 0.95) 100%);
+        backdrop-filter: blur(20px);
+        border-top: 2px solid transparent;
+        border-image: linear-gradient(90deg, #00f5ff, #ff00ff, #ffff00, #00ff00) 1;
+        padding: 3rem 0 2rem;
+        margin-top: 4rem;
+        position: relative;
+        overflow: hidden;
+    ">
+        <div class="container">
+            <!-- Main Navigation -->
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h3 style="color: #ffff00; margin-bottom: 1.5rem; font-size: 1.3rem;">⚡ AetherOS Performance Center</h3>
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;">
+                    <a href="index.html" style="
+                        background: linear-gradient(45deg, #00f5ff, #ff00ff);
+                        padding: 1rem 2rem;
+                        border-radius: 50px;
+                        text-decoration: none;
+                        color: white;
+                        font-weight: bold;
+                        transition: all 0.3s ease;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        box-shadow: 0 4px 15px rgba(0, 245, 255, 0.3);
+                    " onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        🏠 Back to Home
+                    </a>
+                    <a href="docs.html" style="
+                        background: linear-gradient(45deg, #ff00ff, #ffff00);
+                        padding: 1rem 2rem;
+                        border-radius: 50px;
+                        text-decoration: none;
+                        color: white;
+                        font-weight: bold;
+                        transition: all 0.3s ease;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        box-shadow: 0 4px 15px rgba(255, 0, 255, 0.3);
+                    " onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        📚 Documentation
+                    </a>
+                    <a href="labs.html" style="
+                        background: linear-gradient(45deg, #ffff00, #00ff00);
+                        padding: 1rem 2rem;
+                        border-radius: 50px;
+                        text-decoration: none;
+                        color: white;
+                        font-weight: bold;
+                        transition: all 0.3s ease;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        box-shadow: 0 4px 15px rgba(255, 255, 0, 0.3);
+                    " onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        🧪 Interactive Labs
+                    </a>
+                </div>
+            </div>
+
+            <!-- Performance Tools Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                <div style="text-align: center; padding: 1rem; border-radius: 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);">
+                    <h4 style="color: #f38ba8; margin-bottom: 1rem;">🎮 Gaming Performance</h4>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <a href="#fps-analyzer" style="color: #cdd6f4; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#f38ba8'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#cdd6f4'; this.style.transform='translateX(0)'">📊 FPS Analyzer</a>
+                        <a href="#graphics-profiler" style="color: #cdd6f4; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#f38ba8'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#cdd6f4'; this.style.transform='translateX(0)'">🖼️ Graphics Profiler</a>
+                        <a href="#latency-tester" style="color: #cdd6f4; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#f38ba8'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#cdd6f4'; this.style.transform='translateX(0)'">⚡ Latency Tester</a>
+                    </div>
+                </div>
+                <div style="text-align: center; padding: 1rem; border-radius: 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);">
+                    <h4 style="color: #cba6f7; margin-bottom: 1rem;">🔧 Debug Tools</h4>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <a href="#memory-debugger" style="color: #cdd6f4; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#cba6f7'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#cdd6f4'; this.style.transform='translateX(0)'">💾 Memory Debugger</a>
+                        <a href="#cpu-profiler" style="color: #cdd6f4; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#cba6f7'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#cdd6f4'; this.style.transform='translateX(0)'">🧠 CPU Profiler</a>
+                        <a href="#performance-monitor" style="color: #cdd6f4; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#cba6f7'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#cdd6f4'; this.style.transform='translateX(0)'">📈 Performance Monitor</a>
+                    </div>
+                </div>
+                <div style="text-align: center; padding: 1rem; border-radius: 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);">
+                    <h4 style="color: #fab387; margin-bottom: 1rem;">🚀 Optimization</h4>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <a href="#auto-optimizer" style="color: #cdd6f4; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#fab387'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#cdd6f4'; this.style.transform='translateX(0)'">🤖 Auto Optimizer</a>
+                        <a href="#code-analyzer" style="color: #cdd6f4; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#fab387'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#cdd6f4'; this.style.transform='translateX(0)'">🔍 Code Analyzer</a>
+                        <a href="#benchmark-suite" style="color: #cdd6f4; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#fab387'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#cdd6f4'; this.style.transform='translateX(0)'">📊 Benchmark Suite</a>
+                    </div>
+                </div>
+                <div style="text-align: center; padding: 1rem; border-radius: 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);">
+                    <h4 style="color: #a6e3a1; margin-bottom: 1rem;">📚 Resources</h4>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <a href="#optimization-guide" style="color: #cdd6f4; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#a6e3a1'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#cdd6f4'; this.style.transform='translateX(0)'">📖 Optimization Guide</a>
+                        <a href="#best-practices" style="color: #cdd6f4; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#a6e3a1'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#cdd6f4'; this.style.transform='translateX(0)'">✨ Best Practices</a>
+                        <a href="#troubleshooting" style="color: #cdd6f4; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='#a6e3a1'; this.style.transform='translateX(5px)'" onmouseout="this.style.color='#cdd6f4'; this.style.transform='translateX(0)'">🔧 Troubleshooting</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1.5rem; text-align: center;">
+                <p style="color: #888; margin-bottom: 1rem; font-size: 1rem;">
+                    ⚡ Optimize your AetherOS performance with advanced debugging tools
+                </p>
+                <div style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+                    <span style="color: #f38ba8; font-size: 0.9rem;">🎮 Gaming Optimized</span>
+                    <span style="color: #cba6f7; font-size: 0.9rem;">🔧 Professional Tools</span>
+                    <span style="color: #fab387; font-size: 0.9rem;">🚀 Real-time Analysis</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Navigation Helper -->
+    <div class="nav-helper">
+        <h4>Quick Navigation</h4>
+        <div class="nav-helper-links">
+            <a href="index.html">🏠 Home</a>
+            <a href="docs.html">📚 Documentation</a>
+            <a href="labs.html">🧪 Interactive Labs</a>
+        </div>
+    </div>
+</body>
+</html>
